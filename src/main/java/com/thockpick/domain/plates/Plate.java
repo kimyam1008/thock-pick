@@ -1,17 +1,11 @@
-package com.thockpick.domain.entity;
+package com.thockpick.domain.plates;
 
-import com.thockpick.domain.enums.Flexibility;
-import com.thockpick.domain.enums.PlateMaterial;
-import com.thockpick.domain.enums.PlateType;
+import com.thockpick.global.common.BaseEntity;
+import com.thockpick.global.enums.Flexibility;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 /**
  * 보강판 엔티티
@@ -20,8 +14,7 @@ import java.time.LocalDateTime;
 @Table(name = "plates")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
-public class Plate {
+public class Plate extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,11 +47,4 @@ public class Plate {
     private String description;
 
     private Integer googleSheetsRow;
-
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
 }

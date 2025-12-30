@@ -1,4 +1,4 @@
-package com.thockpick.domain.enums;
+package com.thockpick.domain.plates;
 
 /**
  * 보강판 재질

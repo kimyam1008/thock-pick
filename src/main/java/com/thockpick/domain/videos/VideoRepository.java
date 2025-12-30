@@ -1,6 +1,4 @@
-package com.thockpick.domain.repository;
-
-import com.thockpick.domain.entity.Video;
+package com.thockpick.domain.videos;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

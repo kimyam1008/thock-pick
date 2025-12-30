@@ -1,4 +1,4 @@
-package com.thockpick.domain.enums;
+package com.thockpick.domain.switches;
 
 /**
  * 스위치 타입

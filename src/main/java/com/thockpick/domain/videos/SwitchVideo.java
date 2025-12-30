@@ -1,13 +1,11 @@
-package com.thockpick.domain.entity;
+package com.thockpick.domain.videos;
 
+import com.thockpick.domain.switches.Switch;
+import com.thockpick.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 /**
  * 스위치-영상 연관 테이블 (N:M)
@@ -21,8 +19,7 @@ import java.time.LocalDateTime;
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
-public class SwitchVideo {
+public class SwitchVideo extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,8 +35,4 @@ public class SwitchVideo {
 
     @Column(columnDefinition = "INT DEFAULT 0")
     private Integer relevanceScore;
-
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
 }

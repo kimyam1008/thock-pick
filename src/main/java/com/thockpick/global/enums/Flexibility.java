@@ -1,4 +1,4 @@
-package com.thockpick.domain.enums;
+package com.thockpick.global.enums;
 
 /**
  * 유연성

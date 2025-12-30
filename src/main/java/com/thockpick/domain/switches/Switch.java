@@ -1,17 +1,14 @@
-package com.thockpick.domain.entity;
+package com.thockpick.domain.switches;
 
-import com.thockpick.domain.enums.SoundProfile;
-import com.thockpick.domain.enums.SwitchType;
+import com.thockpick.global.common.BaseEntity;
+import com.thockpick.global.enums.SoundProfile;
+import com.thockpick.domain.videos.SwitchVideo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +25,7 @@ import java.util.List;
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
-public class Switch {
+public class Switch extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -82,11 +78,4 @@ public class Switch {
 
     @OneToMany(mappedBy = "switchEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SwitchVideo> switchVideos = new ArrayList<>();
-
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
 }

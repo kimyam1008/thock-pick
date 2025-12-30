@@ -1,8 +1,6 @@
-package com.thockpick.domain.repository;
+package com.thockpick.domain.videos;
 
-import com.thockpick.domain.entity.Switch;
-import com.thockpick.domain.entity.SwitchVideo;
-import com.thockpick.domain.entity.Video;
+import com.thockpick.domain.switches.Switch;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

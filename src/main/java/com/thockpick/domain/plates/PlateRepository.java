@@ -1,8 +1,4 @@
-package com.thockpick.domain.repository;
-
-import com.thockpick.domain.entity.Plate;
-import com.thockpick.domain.enums.PlateMaterial;
-import com.thockpick.domain.enums.PlateType;
+package com.thockpick.domain.plates;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

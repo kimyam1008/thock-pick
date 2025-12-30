@@ -1,12 +1,10 @@
-package com.thockpick.domain.entity;
+package com.thockpick.domain.videos;
 
+import com.thockpick.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,8 +17,7 @@ import java.util.List;
 @Table(name = "videos")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
-public class Video {
+public class Video extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,11 +52,4 @@ public class Video {
 
     @OneToMany(mappedBy = "video", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SwitchVideo> switchVideos = new ArrayList<>();
-
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
 }
