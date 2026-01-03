@@ -40,8 +40,10 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     // Database
-    runtimeOnly 'com.h2database:h2'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
+    // Dotenv
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 
     // Dev Tools
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

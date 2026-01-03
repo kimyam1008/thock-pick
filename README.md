@@ -10,7 +10,7 @@ Google Sheets 기반의 키보드 부품 검색 및 타건음 추천 서비스
 
 - **Backend**: Spring Boot 3.5.9, Java 17
 - **ORM**: Spring Data JPA
-- **Database**: H2 (개발), MySQL/MariaDB (운영)
+- **Database**: MariaDB 
 - **Template Engine**: Thymeleaf
 - **CSS Framework**: Bootstrap 5
 - **External API**: Google Sheets API
