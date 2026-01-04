@@ -32,6 +32,11 @@ public interface SwitchRepository extends JpaRepository<Switch, Long> {
     List<Switch> findByNameContaining(String keyword);
 
     /**
+     * Google Sheets 행 번호와 카테고리로 스위치 조회 (탭별 행 구분)
+     */
+    Optional<Switch> findByGoogleSheetsRowAndCategory(Integer googleSheetsRow, String category);
+
+    /**
      * Google Sheets 행 번호로 스위치 조회
      */
     Optional<Switch> findByGoogleSheetsRow(Integer googleSheetsRow);

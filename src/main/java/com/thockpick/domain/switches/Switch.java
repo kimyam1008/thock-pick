@@ -5,6 +5,7 @@ import com.thockpick.global.enums.SoundProfile;
 import com.thockpick.domain.videos.SwitchVideo;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,16 +32,19 @@ public class Switch extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, length = 100)
     private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private SwitchType type;
 
+    @Column(length = 50)
+    private String category; // 탭 정보 저장 (예: 체리, 저소음, HMX 등)
+
     private Integer weight;
 
-    @Column(length = 50)
+    @Column(length = 255)
     private String manufacturer;
 
     private Integer price;
@@ -55,13 +59,13 @@ public class Switch extends BaseEntity {
     @Column(precision = 3, scale = 1)
     private BigDecimal preTravel;
 
-    @Column(length = 50)
+    @Column(length = 255)
     private String springType;
 
-    @Column(length = 50)
+    @Column(length = 255)
     private String stemMaterial;
 
-    @Column(length = 50)
+    @Column(length = 255)
     private String housingMaterial;
 
     @Enumerated(EnumType.STRING)
@@ -78,4 +82,56 @@ public class Switch extends BaseEntity {
 
     @OneToMany(mappedBy = "switchEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SwitchVideo> switchVideos = new ArrayList<>();
+
+    @Builder
+    public Switch(String name, SwitchType type, String category, Integer weight, String manufacturer,
+                  Integer price, Integer actuationForce, Integer bottomOutForce,
+                  BigDecimal travelDistance, BigDecimal preTravel, String springType,
+                  String stemMaterial, String housingMaterial, SoundProfile soundProfile,
+                  Boolean isLubed, String description, Integer googleSheetsRow) {
+        this.name = name;
+        this.type = type;
+        this.category = category;
+        this.weight = weight;
+        this.manufacturer = manufacturer;
+        this.price = price;
+        this.actuationForce = actuationForce;
+        this.bottomOutForce = bottomOutForce;
+        this.travelDistance = travelDistance;
+        this.preTravel = preTravel;
+        this.springType = springType;
+        this.stemMaterial = stemMaterial;
+        this.housingMaterial = housingMaterial;
+        this.soundProfile = soundProfile;
+        this.isLubed = isLubed != null ? isLubed : false;
+        this.description = description;
+        this.googleSheetsRow = googleSheetsRow;
+    }
+
+    /**
+     * Google Sheets 데이터로 엔티티 업데이트
+     */
+    public void updateFromGoogleSheets(String name, SwitchType type, String category, Integer weight,
+                                       String manufacturer, Integer price, Integer actuationForce,
+                                       Integer bottomOutForce, BigDecimal travelDistance,
+                                       BigDecimal preTravel, String springType, String stemMaterial,
+                                       String housingMaterial, SoundProfile soundProfile,
+                                       Boolean isLubed, String description) {
+        this.name = name;
+        this.type = type;
+        this.category = category;
+        this.weight = weight;
+        this.manufacturer = manufacturer;
+        this.price = price;
+        this.actuationForce = actuationForce;
+        this.bottomOutForce = bottomOutForce;
+        this.travelDistance = travelDistance;
+        this.preTravel = preTravel;
+        this.springType = springType;
+        this.stemMaterial = stemMaterial;
+        this.housingMaterial = housingMaterial;
+        this.soundProfile = soundProfile;
+        this.isLubed = isLubed;
+        this.description = description;
+    }
 }
