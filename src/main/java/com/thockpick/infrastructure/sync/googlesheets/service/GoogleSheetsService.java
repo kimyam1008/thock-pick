@@ -30,13 +30,13 @@ public class GoogleSheetsService {
     private static final String APPLICATION_NAME = "Thock Pick";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
-    @Value("${GOOGLE_SHEETS_SPREADSHEET_ID}")
+    @Value("${google.sheets.spreadsheet-id}")
     private String spreadsheetId;
 
-    @Value("${GOOGLE_SHEETS_RANGE}")
+    @Value("${google.sheets.range}")
     private String range;
 
-    @Value("${GOOGLE_SHEETS_API_KEY}")
+    @Value("${google.sheets.api-key}")
     private String apiKey;
 
     /**
