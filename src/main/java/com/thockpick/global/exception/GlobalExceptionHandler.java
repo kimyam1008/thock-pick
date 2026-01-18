@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * 전역 예외 처리
@@ -69,6 +70,21 @@ public class GlobalExceptionHandler {
                 ErrorCode.METHOD_NOT_ALLOWED.getMessage()
         );
         return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    /**
+     * 리소스를 찾을 수 없을 때 예외 처리 (Chrome DevTools 등 브라우저 요청 무시)
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    protected ResponseEntity<ApiResponse<Void>> handleNoResourceFoundException(NoResourceFoundException e) {
+        // .well-known이나 브라우저 DevTools 요청은 DEBUG 레벨로만 로깅
+        if (e.getMessage().contains(".well-known") || e.getMessage().contains("devtools")) {
+            log.debug("Ignoring browser resource request: {}", e.getResourcePath());
+        } else {
+            log.warn("Resource not found: {}", e.getResourcePath());
+        }
+        ApiResponse<Void> response = ApiResponse.error("NOT_FOUND", "Resource not found");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     /**

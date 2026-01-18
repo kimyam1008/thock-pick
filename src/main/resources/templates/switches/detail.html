@@ -12,6 +12,9 @@
     <link rel="stylesheet" th:href="@{/css/switch-detail.css}">
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
     <div class="container">
         <a class="back-link" href="/switches">← 목록으로 돌아가기</a>
 
@@ -20,29 +23,6 @@
             <h1 class="switch-name" th:text="${switch.name}">Cherry MX Red</h1>
             <div class="switch-category" th:if="${switch.category}">
                 <span th:text="${switch.category}">체리</span>
-            </div>
-        </div>
-
-        <div class="specs-section">
-            <h2 class="specs-title">기본 정보</h2>
-            <div class="specs-grid">
-                <div class="spec-item" th:if="${switch.manufacturer}">
-                    <span class="spec-label">제조사</span>
-                    <span class="spec-value" th:text="${switch.manufacturer}">Cherry</span>
-                </div>
-                <div class="spec-item" th:if="${switch.price}">
-                    <span class="spec-label">가격</span>
-                    <span class="spec-value" th:text="${switch.price} + '원'">500원</span>
-                </div>
-                <div class="spec-item" th:if="${switch.weight}">
-                    <span class="spec-label">무게</span>
-                    <span class="spec-value" th:text="${switch.weight} + 'g'">3.5g</span>
-                </div>
-                <div class="spec-item" th:if="${switch.isLubed}">
-                    <span class="spec-label">윤활</span>
-                    <span class="badge" th:if="${switch.isLubed}">윤활됨</span>
-                    <span class="spec-value" th:unless="${switch.isLubed}">윤활 안됨</span>
-                </div>
             </div>
         </div>
 
@@ -86,6 +66,29 @@
                 <div class="spec-item" th:if="${switch.soundProfile}">
                     <span class="spec-label">사운드 프로필</span>
                     <span class="spec-value" th:text="${switch.soundProfile}">THOCKY</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="specs-section">
+            <h2 class="specs-title">기본 정보</h2>
+            <div class="specs-grid">
+                <div class="spec-item" th:if="${switch.manufacturer}">
+                    <span class="spec-label">제조사</span>
+                    <span class="spec-value" th:text="${switch.manufacturer}">Cherry</span>
+                </div>
+                <div class="spec-item" th:if="${switch.price}">
+                    <span class="spec-label">가격</span>
+                    <span class="spec-value" th:text="${switch.price} + '원'">500원</span>
+                </div>
+                <div class="spec-item" th:if="${switch.weight}">
+                    <span class="spec-label">무게</span>
+                    <span class="spec-value" th:text="${switch.weight} + 'g'">3.5g</span>
+                </div>
+                <div class="spec-item" th:if="${switch.isLubed}">
+                    <span class="spec-label">윤활</span>
+                    <span class="badge" th:if="${switch.isLubed}">윤활됨</span>
+                    <span class="spec-value" th:unless="${switch.isLubed}">윤활 안됨</span>
                 </div>
             </div>
         </div>
