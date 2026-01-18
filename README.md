@@ -1,6 +1,8 @@
-# ThockPick 🎹
+# ThockPick ⌨️
 
 Google Sheets 기반의 키보드 부품 검색 및 타건음 추천 서비스
+
+![ThockPick 홈페이지](docs/images/homepage.png)
 
 ## 📋 프로젝트 소개
 
@@ -52,24 +54,6 @@ cd thock-pick-server
 
 ### 접속
 - 애플리케이션: http://localhost:8080
-
-## 📅 개발 계획
-
-### Phase 1 (MVP) - 3-4주
-- [x] 프로젝트 초기 설정
-- [ ] Google Sheets 동기화
-- [ ] 기본 CRUD API
-- [ ] Thymeleaf 화면 구현
-
-### Phase 2 (고도화) - 2-3주
-- [ ] Elasticsearch 연동
-- [ ] Redis 캐싱
-- [ ] 추천 알고리즘
-
-### Phase 3 (커뮤니티) - 3-4주
-- [ ] 사용자 인증
-- [ ] 리뷰 시스템
-- [ ] 위시리스트
 
 ## 🤝 기여
 

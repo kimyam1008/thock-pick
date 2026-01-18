@@ -1,0 +1,161 @@
+/* 스위치 목록 화면 스타일 (Bootstrap 통합) */
+body {
+    background-color: #f5f5f5;
+}
+
+/* Bootstrap container에 추가 스타일 */
+.container {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+h1 {
+    margin-bottom: 30px;
+    color: #333;
+}
+
+/* Filter Section */
+.filter-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 6px;
+}
+
+.filter-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-group label {
+    font-weight: 500;
+    color: #555;
+}
+
+.filter-group select,
+.filter-group input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filter-group button {
+    padding: 8px 16px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.filter-group button:hover {
+    background: #0056b3;
+}
+
+/* Count */
+.switch-count {
+    margin-bottom: 20px;
+    color: #666;
+    font-size: 14px;
+}
+
+/* Grid */
+.switch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.switch-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 20px;
+    transition: box-shadow 0.2s;
+}
+
+.switch-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.switch-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.switch-info {
+    display: grid;
+    gap: 8px;
+    font-size: 14px;
+    color: #666;
+}
+
+.switch-info-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.switch-info-label {
+    font-weight: 500;
+    color: #888;
+}
+
+/* Type Badge */
+.switch-type {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.switch-type.LINEAR {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.switch-type.TACTILE {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.switch-type.CLICKY {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.switch-type.SILENT {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.detail-link {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 6px 12px;
+    background: #f0f0f0;
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.detail-link:hover {
+    background: #e0e0e0;
+}
+
+.no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}

@@ -1,0 +1,9 @@
+/* 공통 스타일 (Bootstrap과 함께 사용) */
+
+/* Bootstrap이 box-sizing과 기본 리셋을 처리하므로 중복 제거 */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* Bootstrap의 .container를 사용하므로 커스텀 container 제거 */

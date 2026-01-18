@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${switch.name} + ' - Thock Pick'">스위치 상세</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/svg/favicon.svg}">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/switch-detail.css}">
+</head>
+<body>
+    <div class="container">
+        <a class="back-link" href="/switches">← 목록으로 돌아가기</a>
+
+        <div class="switch-header">
+            <span class="switch-type" th:classappend="${switch.type}" th:text="${switch.type}">LINEAR</span>
+            <h1 class="switch-name" th:text="${switch.name}">Cherry MX Red</h1>
+            <div class="switch-category" th:if="${switch.category}">
+                <span th:text="${switch.category}">체리</span>
+            </div>
+        </div>
+
+        <div class="specs-section">
+            <h2 class="specs-title">기본 정보</h2>
+            <div class="specs-grid">
+                <div class="spec-item" th:if="${switch.manufacturer}">
+                    <span class="spec-label">제조사</span>
+                    <span class="spec-value" th:text="${switch.manufacturer}">Cherry</span>
+                </div>
+                <div class="spec-item" th:if="${switch.price}">
+                    <span class="spec-label">가격</span>
+                    <span class="spec-value" th:text="${switch.price} + '원'">500원</span>
+                </div>
+                <div class="spec-item" th:if="${switch.weight}">
+                    <span class="spec-label">무게</span>
+                    <span class="spec-value" th:text="${switch.weight} + 'g'">3.5g</span>
+                </div>
+                <div class="spec-item" th:if="${switch.isLubed}">
+                    <span class="spec-label">윤활</span>
+                    <span class="badge" th:if="${switch.isLubed}">윤활됨</span>
+                    <span class="spec-value" th:unless="${switch.isLubed}">윤활 안됨</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="specs-section">
+            <h2 class="specs-title">스위치 스펙</h2>
+            <div class="specs-grid">
+                <div class="spec-item" th:if="${switch.actuationForce}">
+                    <span class="spec-label">작동압</span>
+                    <span class="spec-value" th:text="${switch.actuationForce} + 'g'">45g</span>
+                </div>
+                <div class="spec-item" th:if="${switch.bottomOutForce}">
+                    <span class="spec-label">바닥압</span>
+                    <span class="spec-value" th:text="${switch.bottomOutForce} + 'g'">60g</span>
+                </div>
+                <div class="spec-item" th:if="${switch.travelDistance}">
+                    <span class="spec-label">총 이동거리</span>
+                    <span class="spec-value" th:text="${switch.travelDistance} + 'mm'">4.0mm</span>
+                </div>
+                <div class="spec-item" th:if="${switch.preTravel}">
+                    <span class="spec-label">작동 거리</span>
+                    <span class="spec-value" th:text="${switch.preTravel} + 'mm'">2.0mm</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="specs-section">
+            <h2 class="specs-title">소재 및 특성</h2>
+            <div class="specs-grid">
+                <div class="spec-item" th:if="${switch.springType}">
+                    <span class="spec-label">스프링 타입</span>
+                    <span class="spec-value" th:text="${switch.springType}">Gold-plated</span>
+                </div>
+                <div class="spec-item" th:if="${switch.stemMaterial}">
+                    <span class="spec-label">스템 소재</span>
+                    <span class="spec-value" th:text="${switch.stemMaterial}">POM</span>
+                </div>
+                <div class="spec-item" th:if="${switch.housingMaterial}">
+                    <span class="spec-label">하우징 소재</span>
+                    <span class="spec-value" th:text="${switch.housingMaterial}">PC</span>
+                </div>
+                <div class="spec-item" th:if="${switch.soundProfile}">
+                    <span class="spec-label">사운드 프로필</span>
+                    <span class="spec-value" th:text="${switch.soundProfile}">THOCKY</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="description-section" th:if="${switch.description}">
+            <h2 class="description-title">상세 설명</h2>
+            <p class="description-text" th:text="${switch.description}">스위치 설명이 여기에 표시됩니다.</p>
+        </div>
+    </div>
+<!-- Bootstrap 5 JS Bundle (Popper 포함) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

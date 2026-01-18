@@ -40,4 +40,9 @@ public interface SwitchRepository extends JpaRepository<Switch, Long> {
      * Google Sheets 행 번호로 스위치 조회
      */
     Optional<Switch> findByGoogleSheetsRow(Integer googleSheetsRow);
+
+    /**
+     * 타입별 스위치 개수 조회 (COUNT 쿼리 사용)
+     */
+    long countByType(SwitchType type);
 }

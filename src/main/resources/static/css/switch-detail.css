@@ -1,0 +1,140 @@
+/* 스위치 상세 화면 스타일 */
+body {
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* Header */
+.switch-header {
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+.switch-type {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.switch-type.LINEAR {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.switch-type.TACTILE {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.switch-type.CLICKY {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.switch-type.SILENT {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.switch-name {
+    font-size: 32px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.switch-category {
+    font-size: 16px;
+    color: #666;
+}
+
+/* Specs Section */
+.specs-section {
+    margin-bottom: 30px;
+}
+
+.specs-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.specs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.spec-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.spec-label {
+    font-size: 13px;
+    color: #888;
+    font-weight: 500;
+}
+
+.spec-value {
+    font-size: 16px;
+    color: #333;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #4caf50;
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Description */
+.description-section {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 6px;
+    margin-top: 30px;
+}
+
+.description-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.description-text {
+    color: #555;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}

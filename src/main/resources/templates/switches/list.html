@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스위치 목록 - Thock Pick</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/svg/favicon.svg}">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/switch-list.css}">
+</head>
+<body>
+    <div class="container">
+        <h1>스위치 목록</h1>
+
+        <!-- 필터 섹션 -->
+        <div class="filter-section">
+            <form method="get" action="/switches">
+                <div class="filter-group">
+                    <label>타입:</label>
+                    <select name="type" onchange="this.form.submit()">
+                        <option value="">전체</option>
+                        <option th:each="typeOption : ${types}"
+                                th:value="${typeOption}"
+                                th:text="${typeOption}"
+                                th:selected="${typeOption.toString() == selectedType}">
+                        </option>
+                    </select>
+
+                    <label>검색:</label>
+                    <input type="text" name="keyword" th:value="${keyword}" placeholder="스위치 이름 검색">
+
+                    <button type="submit">검색</button>
+                    <button type="button" onclick="location.href='/switches'">초기화</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 검색 결과 수 -->
+        <div class="switch-count">
+            총 <strong th:text="${switches.size()}">0</strong>개의 스위치
+        </div>
+
+        <!-- 스위치 목록 -->
+        <div class="switch-grid" th:if="${!switches.isEmpty()}">
+            <div class="switch-card" th:each="switch : ${switches}">
+                <span class="switch-type" th:classappend="${switch.type}" th:text="${switch.type}">LINEAR</span>
+                <div class="switch-name" th:text="${switch.name}">Cherry MX Red</div>
+                <div class="switch-info">
+                    <div class="switch-info-row" th:if="${switch.manufacturer}">
+                        <span class="switch-info-label">제조사:</span>
+                        <span th:text="${switch.manufacturer}">Cherry</span>
+                    </div>
+                    <div class="switch-info-row" th:if="${switch.category}">
+                        <span class="switch-info-label">카테고리:</span>
+                        <span th:text="${switch.category}">체리</span>
+                    </div>
+                    <div class="switch-info-row" th:if="${switch.actuationForce}">
+                        <span class="switch-info-label">작동압:</span>
+                        <span th:text="${switch.actuationForce} + 'g'">45g</span>
+                    </div>
+                    <div class="switch-info-row" th:if="${switch.bottomOutForce}">
+                        <span class="switch-info-label">바닥압:</span>
+                        <span th:text="${switch.bottomOutForce} + 'g'">60g</span>
+                    </div>
+                    <div class="switch-info-row" th:if="${switch.price}">
+                        <span class="switch-info-label">가격:</span>
+                        <span th:text="${switch.price} + '원'">500원</span>
+                    </div>
+                </div>
+                <a class="detail-link" th:href="@{/switches/{id}(id=${switch.id})}">상세보기 →</a>
+            </div>
+        </div>
+
+        <!-- 결과 없음 -->
+        <div class="no-results" th:if="${switches.isEmpty()}">
+            <p>검색 결과가 없습니다.</p>
+        </div>
+    </div>
+    <!-- Bootstrap 5 JS Bundle (Popper 포함) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
