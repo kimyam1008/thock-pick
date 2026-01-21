@@ -1,7 +1,10 @@
 package com.thockpick.infrastructure.sync.googlesheets.service;
 
+import com.thockpick.application.switches.SwitchNicknameService;
 import com.thockpick.domain.switches.Switch;
 import com.thockpick.domain.switches.SwitchRepository;
+import com.thockpick.infrastructure.search.document.SwitchDocument;
+import com.thockpick.infrastructure.search.repository.SwitchSearchRepository;
 import com.thockpick.infrastructure.sync.googlesheets.dto.SwitchSheetRow;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +24,10 @@ public class SwitchSyncService {
 
     private final GoogleSheetsService googleSheetsService;
     private final SwitchRepository switchRepository;
+
+    // ES 저장소 & 별명 서비스 주입
+    private final SwitchSearchRepository switchSearchRepository;
+    private final SwitchNicknameService switchNicknameService;
 
     /**
      * Google Sheets의 모든 스위치 데이터를 DB와 동기화
@@ -68,6 +75,8 @@ public class SwitchSyncService {
      * (private 메서드라 @Transactional이 안 먹히지만, repository.save()가 트랜잭션을 가짐)
      */
     private void processSingleSwitch(SwitchSheetRow row) {
+        Switch savedSwitch;     // 저장된 스위치를 담을 변수
+
         // 1. 행 번호 + 카테고리(탭 이름) 조합으로 정확한 데이터 찾기
         Optional<Switch> existingSwitch = switchRepository.findByGoogleSheetsRowAndCategory(
                 row.getRowNumber(),
@@ -100,10 +109,40 @@ public class SwitchSyncService {
                     row.toEntity().getIsLubed(),
                     row.toEntity().getDescription()
             );
-            switchRepository.save(switchEntity);
+            savedSwitch = switchRepository.save(switchEntity);  // 업데이트된 엔티티 저장
         } else {
             Switch newSwitch = row.toEntity();
-            switchRepository.save(newSwitch);
+            savedSwitch = switchRepository.save(newSwitch);     // 신규 엔티티 저장
+        }
+
+        // Elasticsearch 에도 저장 (동기화)
+        saveToElasticsearch(savedSwitch);
+    }
+
+    /**
+     * ES 저장 로직 분리
+     * @param switchEntity
+     */
+    private void saveToElasticsearch(Switch switchEntity) {
+        try {
+            // 별명 가져오기 (예: "Cherry MX Red" -> ["적축", "체리적축"])
+            List<String> nicknames = switchNicknameService.getNicknames(switchEntity.getName());
+
+            // ES 문서 생성
+            SwitchDocument doc = SwitchDocument.builder()
+                    .id(switchEntity.getId())
+                    .name(switchEntity.getName())
+                    .brand(switchEntity.getManufacturer()) // 제조사 정보 (있다면)
+                    .nicknames(nicknames) // 별명 주입
+                    .build();
+
+            // 3. ES 저장
+            switchSearchRepository.save(doc);
+
+        } catch (Exception e) {
+            // ES 저장이 실패하더라도 MariaDB 저장은 롤백되지 않도록 로그만 찍고 넘어감
+            // (검색 인덱싱은 나중에 다시 맞춰도 되지만, DB 데이터 유실은 막아야 하니까)
+            log.error("Elasticsearch 인덱싱 실패 (ID: {}): {}", switchEntity.getId(), e.getMessage());
         }
     }
 
