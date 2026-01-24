@@ -5,6 +5,7 @@ import com.thockpick.domain.switches.SwitchType;
 import com.thockpick.global.enums.SoundProfile;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
@@ -47,6 +48,16 @@ public class SwitchSheetRow {
      */
     public static SwitchSheetRow from(int rowNumber, List<Object> values, Map<String, Integer> headerMap, String sheetTitle) {
 
+        // 원본 데이터 추출
+        String rawName = getStringValue(values, headerMap, "스위치이름");
+
+        // 데이터 정제
+        String cleanName = cleanString(rawName);
+
+        // 시트 이름 정제 (예: "체리(9)" -> "체리", "Outemu(오테뮤)&Gazzew(4)" -> "Outemu(오테뮤)&Gazzew")
+        // 괄호 안에 숫자가 있는 패턴만 제거하거나, 단순히 마지막 괄호 덩어리를 제거
+        String cleanCategory = sheetTitle.replaceAll("\\([0-9]+\\)$", "").trim();
+
         // 키압과 소재는 복합 데이터이므로 먼저 파싱
         String keyPressure = getStringValue(values, headerMap, "키압");
         String materialsRaw = getStringValue(values, headerMap, "소재");
@@ -54,14 +65,11 @@ public class SwitchSheetRow {
         String[] forces = parseForces(keyPressure);
         String[] materials = parseMaterials(materialsRaw);
 
-        // 시트 이름 정제 (예: "체리(9)" -> "체리", "Outemu(오테뮤)&Gazzew(4)" -> "Outemu(오테뮤)&Gazzew")
-        // 괄호 안에 숫자가 있는 패턴만 제거하거나, 단순히 마지막 괄호 덩어리를 제거
-        String cleanCategory = sheetTitle.replaceAll("\\([0-9]+\\)$", "").trim();
 
         return SwitchSheetRow.builder()
                 .rowNumber(rowNumber)
                 .category(cleanCategory) // 카테고리 저장
-                .name(getStringValue(values, headerMap, "스위치이름"))
+                .name(cleanName)    // 정제된 이름
                 .type(getStringValue(values, headerMap, "스위치타입"))
                 .actuationForce(forces[0])
                 .bottomOutForce(forces[1])
@@ -80,6 +88,15 @@ public class SwitchSheetRow {
                 .soundProfile(getStringValue(values, headerMap, "소리특성"))
                 .description(getStringValue(values, headerMap, "설명"))
                 .build();
+    }
+
+    /**
+     * 공통 문자열 정제 메서드 (물음표 제거 등)
+     */
+    private static String cleanString(String input) {
+        if (input == null) return null;
+        // 물음표 제거 + 앞뒤 공백 제거
+        return input.replace("?", "").trim();
     }
 
     /**

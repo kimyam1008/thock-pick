@@ -23,6 +23,10 @@ public class SwitchDocument {
     @Field(type = FieldType.Keyword)
     private String brand;
 
+    // 카테고리 필드 (저소음, HMX, 체리 등)
+    @Field(type = FieldType.Text, analyzer = "nori")
+    private String category;
+
     @Field(type = FieldType.Text, analyzer = "nori")
     private List<String> nicknames; // 우리가 주입한 별명들
 }

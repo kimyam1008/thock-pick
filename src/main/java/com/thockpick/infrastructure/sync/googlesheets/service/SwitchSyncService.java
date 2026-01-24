@@ -132,11 +132,12 @@ public class SwitchSyncService {
             SwitchDocument doc = SwitchDocument.builder()
                     .id(switchEntity.getId())
                     .name(switchEntity.getName())
-                    .brand(switchEntity.getManufacturer()) // 제조사 정보 (있다면)
+                    .brand(switchEntity.getManufacturer())
+                    .category(switchEntity.getCategory()) // 카테고리 추가
                     .nicknames(nicknames) // 별명 주입
                     .build();
 
-            // 3. ES 저장
+            // ES 저장
             switchSearchRepository.save(doc);
 
         } catch (Exception e) {

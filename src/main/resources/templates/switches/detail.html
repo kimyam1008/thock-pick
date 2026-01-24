@@ -16,7 +16,7 @@
     <div th:replace="~{fragments/navbar :: navbar}"></div>
 
     <div class="container">
-        <a class="back-link" href="/switches">← 목록으로 돌아가기</a>
+        <a class="back-link" href="/switches" onclick="history.back(); return false;">← 목록으로 돌아가기</a>
 
         <div class="switch-header">
             <span class="switch-type" th:classappend="${switch.type}" th:text="${switch.type}">LINEAR</span>
