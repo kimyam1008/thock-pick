@@ -204,8 +204,8 @@ const SwitchListApp = {
         pagination.appendChild(createPageItem('이전', data.currentPage - 1, false, !data.hasPrevious));
 
         // 페이지 번호
-        const startPage = Math.max(0, data.currentPage - 4);
-        const endPage = Math.min(data.totalPages, startPage + 10);
+        const startPage = Math.max(0, data.currentPage - 2);
+        const endPage = Math.min(data.totalPages, startPage + 5);
 
         for (let i = startPage; i < endPage; i++) {
             pagination.appendChild(createPageItem(i + 1, i, i === data.currentPage));
