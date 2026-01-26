@@ -53,7 +53,7 @@ cd thock-pick-server
 ```
 
 ### 접속
-- 애플리케이션: http://localhost:8080
+- 애플리케이션: http://thockpick.com/
 
 ## 🤝 기여
 
