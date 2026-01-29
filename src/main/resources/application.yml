@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: thock-pick-server
+
+  # MariaDB Configuration
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MariaDBDialect
+        jdbc:
+          time_zone: Asia/Seoul
+
+  # Thymeleaf Configuration
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+
+  # Elasticsearch
+  elasticsearch:
+    uris: ${ELASTICSEARCH_URL:http://localhost:9200}
+    socket-timeout: 30s
+
+server:
+  forward-headers-strategy: native # 추가: 프록시(Nginx) 헤더를 신뢰하여 HTTPS로 인식하게 함
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+
+# Google Sheets API Configuration
+google:
+  sheets:
+    spreadsheet-id: ${GOOGLE_SHEETS_SPREADSHEET_ID}
+    range: ${GOOGLE_SHEETS_RANGE}
+    api-key: ${GOOGLE_SHEETS_API_KEY}
