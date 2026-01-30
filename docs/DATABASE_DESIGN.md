@@ -107,24 +107,25 @@
 | 컬럼명 | 타입 | 제약조건 | 설명 |
 |-------|------|---------|------|
 | id | BIGINT | PK, AUTO_INCREMENT | 기본키 |
-| name | VARCHAR(100) | NOT NULL, UNIQUE | 스위치 이름 (예: "Gateron Yellow") |
-| type | ENUM | NOT NULL | LINEAR, TACTILE, CLICKY |
+| name | VARCHAR(100) | NOT NULL | 스위치 이름 (예: "Gateron Yellow") |
+| type | VARCHAR(20) | NOT NULL | LINEAR, TACTILE, CLICKY |
+| category | VARCHAR(50) | | 탭 정보 (예: 체리, 저소음, HMX) |
 | weight | INT | | 무게 (g, 예: 50) |
-| manufacturer | VARCHAR(50) | | 제조사 (예: "Gateron", "Cherry") |
+| manufacturer | VARCHAR(255) | | 제조사 (예: "Gateron", "Cherry") |
 | price | INT | | 가격 (원, 1개당) |
 | actuation_force | INT | | 작동 압력 (g) |
 | bottom_out_force | INT | | 바닥 압력 (g) |
 | travel_distance | DECIMAL(3,1) | | 총 이동 거리 (mm) |
 | pre_travel | DECIMAL(3,1) | | 작동 거리 (mm) |
-| spring_type | VARCHAR(50) | | 스프링 타입 (예: "Progressive") |
-| stem_material | VARCHAR(50) | | 스템 재질 (예: "POM") |
-| housing_material | VARCHAR(50) | | 하우징 재질 (예: "Nylon") |
-| sound_profile | VARCHAR(50) | | 소리 특성 (QUIET, NORMAL, LOUD) |
+| spring_type | VARCHAR(255) | | 스프링 타입 (예: "Progressive") |
+| stem_material | VARCHAR(255) | | 스템 재질 (예: "POM") |
+| housing_material | VARCHAR(255) | | 하우징 재질 (예: "Nylon") |
+| sound_profile | VARCHAR(20) | | 소리 특성 (QUIET, NORMAL, LOUD) |
 | is_lubed | BOOLEAN | DEFAULT FALSE | 윤활 여부 |
 | description | TEXT | | 상세 설명 |
 | google_sheets_row | INT | | Google Sheets 행 번호 (동기화용) |
-| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 생성일시 |
-| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE | 수정일시 |
+| created_at | TIMESTAMP | NOT NULL | 생성일시 (BaseEntity 자동 관리) |
+| updated_at | TIMESTAMP | NOT NULL | 수정일시 (BaseEntity 자동 관리) |
 
 #### 인덱스
 
@@ -140,33 +141,57 @@ CREATE INDEX idx_google_sheets_row ON switches(google_sheets_row);
 
 ```java
 @Entity
-@Table(name = "switches")
-@Getter @Setter
-@NoArgsConstructor
-public class Switch {
+@Table(name = "switches", indexes = {
+    @Index(name = "idx_switch_type", columnList = "type"),
+    @Index(name = "idx_switch_manufacturer", columnList = "manufacturer"),
+    @Index(name = "idx_switch_price", columnList = "price"),
+    @Index(name = "idx_switch_name", columnList = "name"),
+    @Index(name = "idx_google_sheets_row", columnList = "googleSheetsRow")
+})
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Switch extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, length = 100)
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private SwitchType type;
 
+    @Column(length = 50)
+    private String category;
+
     private Integer weight;
+
+    @Column(length = 255)
     private String manufacturer;
+
     private Integer price;
     private Integer actuationForce;
     private Integer bottomOutForce;
+
+    @Column(precision = 3, scale = 1)
     private BigDecimal travelDistance;
+
+    @Column(precision = 3, scale = 1)
     private BigDecimal preTravel;
+
+    @Column(length = 255)
     private String springType;
+
+    @Column(length = 255)
     private String stemMaterial;
+
+    @Column(length = 255)
     private String housingMaterial;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)
     private SoundProfile soundProfile;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
@@ -177,23 +202,21 @@ public class Switch {
 
     private Integer googleSheetsRow;
 
-    @OneToMany(mappedBy = "switch", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "switchEntity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SwitchVideo> switchVideos = new ArrayList<>();
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+    // createdAt, updatedAt은 BaseEntity에서 관리
 }
 ```
+
+**참고**: `BaseEntity`를 상속받아 createdAt, updatedAt을 자동으로 관리합니다.
 
 ---
 
 ### 2. Plate (보강판)
 
 #### 설명
-키보드 보강판 정보를 저장하는 테이블
+키보드 보강판 정보를 저장하는 테이블 (현재 미사용, 향후 확장 예정)
 
 #### 컬럼 정의
 
@@ -201,16 +224,16 @@ public class Switch {
 |-------|------|---------|------|
 | id | BIGINT | PK, AUTO_INCREMENT | 기본키 |
 | name | VARCHAR(100) | NOT NULL | 보강판 이름 |
-| material | ENUM | NOT NULL | ALUMINUM, BRASS, POLYCARBONATE, FR4, CARBON_FIBER |
-| type | ENUM | | FULL, HALF, GASKET |
+| material | VARCHAR(20) | NOT NULL | ALUMINUM, BRASS, POLYCARBONATE, FR4, CARBON_FIBER |
+| type | VARCHAR(20) | | FULL, HALF, GASKET |
 | price | INT | | 가격 (원) |
 | compatibility | VARCHAR(200) | | 호환 키보드 (예: "60%, 65%") |
 | flexibility | VARCHAR(20) | | 유연성 (RIGID, MEDIUM, FLEXIBLE) |
 | sound_profile | VARCHAR(50) | | 소리 특성 (CLACKY, THOCKY, MUTED) |
 | description | TEXT | | 상세 설명 |
 | google_sheets_row | INT | | Google Sheets 행 번호 |
-| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 생성일시 |
-| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE | 수정일시 |
+| created_at | TIMESTAMP | NOT NULL | 생성일시 (BaseEntity 자동 관리) |
+| updated_at | TIMESTAMP | NOT NULL | 수정일시 (BaseEntity 자동 관리) |
 
 #### 인덱스
 
@@ -224,7 +247,7 @@ CREATE INDEX idx_plate_type ON plates(type);
 ### 3. Video (유튜브 영상)
 
 #### 설명
-타건음 유튜브 영상 정보를 저장하는 테이블
+타건음 유튜브 영상 정보를 저장하는 테이블 (현재 미사용, 향후 확장 예정)
 
 #### 컬럼 정의
 
@@ -241,8 +264,8 @@ CREATE INDEX idx_plate_type ON plates(type);
 | duration | INT | | 영상 길이 (초) |
 | description | TEXT | | 영상 설명 |
 | google_sheets_row | INT | | Google Sheets 행 번호 |
-| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 생성일시 |
-| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE | 수정일시 |
+| created_at | TIMESTAMP | NOT NULL | 생성일시 (BaseEntity 자동 관리) |
+| updated_at | TIMESTAMP | NOT NULL | 수정일시 (BaseEntity 자동 관리) |
 
 #### 인덱스
 
@@ -256,17 +279,18 @@ CREATE INDEX idx_video_view_count ON videos(view_count);
 ### 4. SwitchVideo (스위치-영상 연관 테이블)
 
 #### 설명
-스위치와 유튜브 영상의 N:M 관계를 표현하는 중간 테이블
+스위치와 유튜브 영상의 N:M 관계를 표현하는 중간 테이블 (현재 미사용, 향후 확장 예정)
 
 #### 컬럼 정의
 
 | 컬럼명 | 타입 | 제약조건 | 설명 |
 |-------|------|---------|------|
 | id | BIGINT | PK, AUTO_INCREMENT | 기본키 |
-| switch_id | BIGINT | FK (switches.id) | 스위치 ID |
-| video_id | BIGINT | FK (videos.id) | 영상 ID |
+| switch_id | BIGINT | FK (switches.id), NOT NULL | 스위치 ID |
+| video_id | BIGINT | FK (videos.id), NOT NULL | 영상 ID |
 | relevance_score | INT | DEFAULT 0 | 관련도 점수 (추천 순서) |
-| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | 생성일시 |
+| created_at | TIMESTAMP | NOT NULL | 생성일시 (BaseEntity 자동 관리) |
+| updated_at | TIMESTAMP | NOT NULL | 수정일시 (BaseEntity 자동 관리) |
 
 #### 인덱스
 
@@ -364,7 +388,7 @@ CREATE INDEX idx_switch_video_video ON switch_videos(video_id);
 
 ---
 
-## 📦 초기 데이터 (Seed Data)
+## 📦 Enum 타입 정의
 
 ### Switch Type Enum
 ```java
@@ -395,19 +419,42 @@ public enum PlateMaterial {
 }
 ```
 
+### Plate Type Enum
+```java
+public enum PlateType {
+    FULL,       // 풀 플레이트
+    HALF,       // 하프 플레이트
+    GASKET      // 개스킷 마운트
+}
+```
+
+### Flexibility Enum
+```java
+public enum Flexibility {
+    RIGID,      // 단단함
+    MEDIUM,     // 중간
+    FLEXIBLE    // 유연함
+}
+```
+
 ---
 
 ## 🚀 마이그레이션 전략
 
-### Phase 1
-- Switch, Plate, Video, SwitchVideo 테이블 생성
+### Phase 1 (현재 완료)
+- ✅ Switch 테이블 생성 및 인덱스 적용
+- ✅ Plate, Video, SwitchVideo 테이블 생성 (엔티티만, 미사용)
+- ✅ BaseEntity를 통한 자동 타임스탬프 관리
+- ✅ Google Sheets 동기화 기능 구현
 
-### Phase 2
-- 인덱스 최적화
-- 통계 데이터용 집계 테이블 추가 (선택)
+### Phase 2 (향후 계획)
+- Video, SwitchVideo 테이블 실제 사용
+- 유튜브 영상 연동 기능 구현
+- 인덱스 성능 모니터링 및 최적화
 
-### Phase 3
+### Phase 3 (향후 계획)
 - User, Wishlist, Review, Build 테이블 추가
+- 회원 시스템 구현
 
 ---
 
@@ -451,27 +498,30 @@ public enum PlateMaterial {
 -- Switch 테이블
 CREATE TABLE switches (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL UNIQUE,
+    name VARCHAR(100) NOT NULL,
     type VARCHAR(20) NOT NULL,
+    category VARCHAR(50),
     weight INT,
-    manufacturer VARCHAR(50),
+    manufacturer VARCHAR(255),
     price INT,
     actuation_force INT,
     bottom_out_force INT,
     travel_distance DECIMAL(3,1),
     pre_travel DECIMAL(3,1),
-    spring_type VARCHAR(50),
-    stem_material VARCHAR(50),
-    housing_material VARCHAR(50),
+    spring_type VARCHAR(255),
+    stem_material VARCHAR(255),
+    housing_material VARCHAR(255),
     sound_profile VARCHAR(20),
     is_lubed BOOLEAN DEFAULT FALSE,
     description TEXT,
     google_sheets_row INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_type (type),
-    INDEX idx_manufacturer (manufacturer),
-    INDEX idx_price (price)
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    INDEX idx_switch_type (type),
+    INDEX idx_switch_manufacturer (manufacturer),
+    INDEX idx_switch_price (price),
+    INDEX idx_switch_name (name),
+    INDEX idx_google_sheets_row (google_sheets_row)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
@@ -493,11 +543,36 @@ CREATE TABLE switches (
 
 ## 🔄 동기화 시 데이터 처리
 
-### Google Sheets → RDB
+### Google Sheets → MariaDB
 1. **신규 데이터**: INSERT
-2. **기존 데이터 변경**: UPDATE (google_sheets_row 기준)
-3. **삭제된 데이터**: Soft Delete (is_deleted 플래그) 또는 Hard Delete
+2. **기존 데이터 변경**: UPDATE (google_sheets_row 기준으로 판단)
+3. **삭제된 데이터**: 현재는 처리하지 않음 (향후 구현 예정)
 
-### RDB → Elasticsearch
-1. 동기화 완료 후 자동 인덱싱
-2. Bulk API 사용으로 성능 최적화
+### MariaDB → Elasticsearch
+1. MariaDB 저장 직후 자동 인덱싱
+2. 별명 서비스(SwitchNicknameService)를 통한 한글 별명 자동 매핑
+3. ES 저장 실패 시 로그만 남기고 계속 진행 (데이터 유실 방지)
+
+## 🗄️ BaseEntity 공통 필드
+
+모든 엔티티는 `BaseEntity`를 상속받아 타임스탬프를 자동 관리합니다.
+
+```java
+@Getter
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+public abstract class BaseEntity {
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+}
+```
+
+**특징:**
+- `@CreatedDate`: 엔티티 생성 시 자동으로 현재 시각 저장
+- `@LastModifiedDate`: 엔티티 수정 시 자동으로 현재 시각 업데이트
+- JPA Auditing 활성화 필요 (`@EnableJpaAuditing`)

@@ -2,15 +2,15 @@
 
 ## 📋 프로젝트 개요
 
-ThockPick은 Google Sheets를 기반으로 한 키보드 부품(스위치, 보강판) 검색 및 유튜브 타건음 추천 서비스입니다.
+ThockPick은 Google Sheets를 기반으로 한 키보드 스위치 검색 서비스입니다.
 
-사용자의 취향(리니어/택타일 등)을 입력받아 적합한 부품을 검색하고, 해당 부품의 타건음을 들을 수 있는 유튜브 영상을 추천합니다.
+사용자의 취향(리니어/택타일 등)을 입력받아 적합한 스위치를 검색할 수 있으며, Elasticsearch를 활용한 한글 별명 검색을 지원합니다.
 
 ## 🏗️ 전체 아키텍처
 
 ```
 ┌─────────────────┐
-│  Google Sheets  │  ← 사용자가 스위치/보강판 정보 입력
+│  Google Sheets  │  ← 스위치 정보 입력 및 관리
 └────────┬────────┘
          │
          ▼
@@ -18,52 +18,56 @@ ThockPick은 Google Sheets를 기반으로 한 키보드 부품(스위치, 보�
 │                    Spring Boot Server                    │
 │                                                           │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │         1. Data Sync Layer (스케줄러)             │   │
-│  │  - Google Sheets API 주기적 호출                  │   │
-│  │  - 데이터 변경 감지 및 동기화                      │   │
+│  │         1. Data Sync Layer (동기화)               │   │
+│  │  - Google Sheets API 호출                         │   │
+│  │  - 데이터 동기화 (수동 트리거)                     │   │
 │  └──────────────┬───────────────────────────────────┘   │
 │                 │                                         │
 │                 ▼                                         │
 │  ┌──────────────────────────────────────────────────┐   │
 │  │      2. Persistence Layer (영속성 저장)           │   │
-│  │  - JPA + RDB (MySQL/PostgreSQL)                   │   │
-│  │  - 스위치, 보강판, 유튜브 정보 저장                │   │
+│  │  - JPA + MariaDB                                  │   │
+│  │  - 스위치 정보 저장                                │   │
 │  └──────────────┬───────────────────────────────────┘   │
 │                 │                                         │
-│     ┌───────────┴───────────┐                            │
-│     ▼                       ▼                            │
-│  ┌────────────────┐   ┌──────────────────┐              │
-│  │  3. Search     │   │  4. Cache        │              │
-│  │  Elasticsearch │   │  Redis           │              │
-│  │                │   │                  │              │
-│  │ - 텍스트 검색   │   │ - 인기 부품      │              │
-│  │ - 필터링       │   │ - 추천 매핑      │              │
-│  │ - 자동완성     │   │ - 세션 데이터    │              │
-│  └────────────────┘   └──────────────────┘              │
-│           │                     │                         │
-│           └──────────┬──────────┘                         │
-│                      ▼                                    │
+│                 ▼                                         │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │         5. Service Layer (비즈니스 로직)          │   │
-│  │  - 부품 검색 서비스                               │   │
-│  │  - 유튜브 추천 서비스                             │   │
-│  │  - 사용자 취향 매칭                               │   │
-│  └──────────────────────────────────────────────────┘   │
-│                      │                                    │
-│                      ▼                                    │
+│  │  3. Search Engine (검색 엔진)                     │   │
+│  │  - Elasticsearch + Nori Analyzer                 │   │
+│  │  - 한글 별명 검색                                  │   │
+│  │  - 전문 검색 및 필터링                             │   │
+│  └──────────────┬───────────────────────────────────┘   │
+│                 │                                         │
+│                 ▼                                         │
 │  ┌──────────────────────────────────────────────────┐   │
-│  │         6. REST API Controller                    │   │
-│  │  - GET  /api/switches                             │   │
-│  │  - GET  /api/switches/search                      │   │
-│  │  - GET  /api/plates                               │   │
-│  │  - GET  /api/recommendations                      │   │
+│  │      4. Service Layer (비즈니스 로직)             │   │
+│  │  - SwitchService: 검색 및 조회                    │   │
+│  │  - SwitchSyncService: Google Sheets 동기화        │   │
+│  │  - SwitchNicknameService: 별명 매핑               │   │
+│  └──────────────┬───────────────────────────────────┘   │
+│                 │                                         │
+│                 ▼                                         │
+│  ┌──────────────────────────────────────────────────┐   │
+│  │      5. Presentation Layer (컨트롤러)             │   │
+│  │  - GET  / (홈페이지)                              │   │
+│  │  - GET  /switches (목록)                          │   │
+│  │  - GET  /switches/api (Ajax API)                 │   │
+│  │  - GET  /switches/{id} (상세)                     │   │
+│  │  - POST /api/sync/switches (동기화)               │   │
+│  └──────────────┬───────────────────────────────────┘   │
+│                 │                                         │
+│                 ▼                                         │
+│  ┌──────────────────────────────────────────────────┐   │
+│  │      6. View Layer (Thymeleaf)                    │   │
+│  │  - 서버 사이드 렌더링                              │   │
+│  │  - Bootstrap 5 UI                                 │   │
 │  └──────────────────────────────────────────────────┘   │
 └───────────────────────────┬─────────────────────────────┘
                             │
                             ▼
                     ┌───────────────┐
-                    │  Client App   │
-                    │  (Web/Mobile) │
+                    │   사용자       │
+                    │  (웹 브라우저)  │
                     └───────────────┘
 ```
 
@@ -71,165 +75,124 @@ ThockPick은 Google Sheets를 기반으로 한 키보드 부품(스위치, 보�
 
 ### 1. 데이터 동기화 플로우
 ```
-Google Sheets → Scheduler → Validation → JPA → RDB
-                                              ↓
-                                         Elasticsearch 인덱싱
+Google Sheets → API Call → Validation → MariaDB 저장
+                                            ↓
+                                   SwitchNicknameService (별명 조회)
+                                            ↓
+                                   Elasticsearch 인덱싱
 ```
 
 ### 2. 검색 플로우
 ```
-Client Request → Controller → Service
-                                 ↓
-                     ┌───────────┴──────────┐
-                     ▼                      ▼
-                 Redis Cache          Elasticsearch
-                 (Cache Hit)          (Cache Miss)
-                     ↓                      ↓
-                     └──────────┬───────────┘
-                                ▼
-                           Response
+사용자 요청 → Controller → Service
+                             ↓
+                 ┌───────────┴──────────┐
+                 ▼                      ▼
+            MariaDB 조회         Elasticsearch 검색
+         (type, manufacturer)    (keyword, 별명)
+                 ↓                      ↓
+                 └──────────┬───────────┘
+                            ▼
+                      Response (JSON/HTML)
 ```
 
-### 3. 추천 플로우
+### 3. 페이지 렌더링 플로우
 ```
-사용자 취향 입력 → 부품 검색 → RDB에서 관련 유튜브 정보 조회
-                                        ↓
-                                Redis 캐싱
-                                        ↓
-                              유튜브 링크 반환
+GET /switches → Controller → Service → MariaDB
+                     ↓
+                 Model 생성
+                     ↓
+           Thymeleaf Template
+                     ↓
+                HTML Response
 ```
 
 ## 📦 레이어별 상세 설명
 
-### Layer 1: Data Entry (데이터 입력)
-- **역할**: 커뮤니티 기반 데이터 수집
-- **도구**: Google Sheets
-- **데이터**:
-  - 스위치 정보 (이름, 타입, 무게, 재질, 가격 등)
-  - 보강판 정보 (재질, 타입, 호환성 등)
-  - 유튜브 타건음 영상 링크
-
-### Layer 2: Sync Layer (동기화 레이어)
-- **역할**: Google Sheets 데이터를 주기적으로 가져와 DB와 동기화
-- **기술**: Spring Scheduler + Google Sheets API
-- **주요 기능**:
-  - Cron 기반 주기적 동기화 (예: 1시간마다)
-  - 데이터 변경 감지 (diff)
-  - 유효성 검증
-  - 에러 핸들링 및 로깅
-
-### Layer 3: Persistence Layer (영속성 레이어)
-- **역할**: 데이터의 영구 저장 및 관계 관리
-- **기술**: Spring Data JPA + MySQL/PostgreSQL
+### Domain Layer (도메인 레이어)
+- **역할**: 핵심 비즈니스 엔티티 및 리포지토리 인터페이스 정의
+- **기술**: JPA Entity, Repository Interface
 - **주요 엔티티**:
-  - `Switch`: 스위치 정보
-  - `Plate`: 보강판 정보
-  - `Video`: 유튜브 영상 정보
-  - `SwitchVideo`: 스위치-영상 연관 관계
+  - `Switch`: 스위치 정보 (이름, 타입, 무게, 제조사, 가격 등)
+  - `SwitchType`: 스위치 타입 Enum (LINEAR, TACTILE, CLICKY)
+  - `SwitchRepository`: 스위치 조회 인터페이스
 
-### Layer 4: Search Engine (검색 엔진)
-- **역할**: 고속 텍스트 검색 및 필터링
-- **기술**: Elasticsearch
-- **인덱싱 데이터**:
-  - 스위치명, 제조사, 타입
-  - 보강판명, 재질
-  - 검색 키워드, 태그
-- **주요 기능**:
-  - 전문 검색 (Full-text search)
-  - 필터링 (타입, 가격대, 무게 등)
-  - 자동완성
-  - 관련도 기반 정렬
-
-### Layer 5: Caching Layer (캐싱 레이어)
-- **역할**: 자주 조회되는 데이터 캐싱으로 응답 속도 향상
-- **기술**: Redis
-- **캐싱 대상**:
-  - 인기 스위치 Top 10
-  - 추천 스위치 목록
-  - 스위치-유튜브 매핑
-  - 검색 결과 (단기 캐싱)
-- **캐시 전략**:
-  - TTL: 1시간 ~ 24시간
-  - Cache-Aside Pattern
-  - 데이터 동기화 시 캐시 무효화
-
-### Layer 6: Service Layer (서비스 레이어)
+### Application Layer (애플리케이션 레이어)
 - **역할**: 비즈니스 로직 처리
 - **주요 서비스**:
-  - `SwitchService`: 스위치 검색, 필터링, 추천
-  - `PlateService`: 보강판 검색, 호환성 체크
-  - `RecommendationService`: 사용자 취향 기반 추천
-  - `SyncService`: Google Sheets 동기화
-  - `VideoService`: 유튜브 영상 관리
+  - `SwitchService`: 스위치 검색, 조회, 통계
+  - `SwitchNicknameService`: 한글 별명 매핑 관리
+
+### Infrastructure Layer (인프라 레이어)
+- **역할**: 외부 시스템 연동 및 기술 구현
+- **주요 컴포넌트**:
+  - **Google Sheets 동기화**:
+    - `GoogleSheetsService`: Sheets API 호출
+    - `SwitchSyncService`: 데이터 동기화 로직
+  - **Elasticsearch 검색**:
+    - `SwitchDocument`: ES 인덱스 문서 모델
+    - `SwitchSearchRepository`: ES 검색 리포지토리
+
+### Presentation Layer (프레젠테이션 레이어)
+- **역할**: 사용자 요청 처리 및 응답
+- **기술**: Spring MVC + Thymeleaf
+- **주요 컨트롤러**:
+  - `HomeController`: 홈 페이지 (통계 표시)
+  - `SwitchViewController`: 스위치 목록/상세 페이지
+  - `SwitchSyncController`: 동기화 API
 
 ## 🎯 핵심 기능
 
 ### 1. 스위치 검색
-- 키워드 기반 검색 (Elasticsearch)
-- 필터링: 타입(리니어/택타일/클릭키), 무게, 가격대, 제조사
-- 정렬: 관련도, 인기도, 가격순
+- **키워드 검색**: Elasticsearch를 활용한 한글 별명 검색 (예: "적축", "청축")
+- **필터링**: 타입(LINEAR, TACTILE, CLICKY), 제조사
+- **정렬**: 이름 순
+- **페이지네이션**: 12개씩 페이지 단위 조회
 
-### 2. 유튜브 추천
-- 스위치별 타건음 영상 매핑
-- 보강판 조합별 영상 추천
-- 인기 영상 우선 정렬
+### 2. Google Sheets 동기화
+- **수동 트리거**: POST /api/sync/switches 호출
+- **데이터 플로우**: Google Sheets → MariaDB → Elasticsearch
+- **별명 자동 매핑**: switch_nicknames.json 기반
 
-### 3. 취향 기반 추천
-- 사용자 선호도 입력 (타입, 무게, 소리 특성)
-- 매칭 알고리즘으로 최적 스위치 추천
-- 관련 유튜브 영상 함께 제공
+### 3. 통계 및 대시보드
+- **홈 화면**: 전체 스위치 개수 및 타입별 통계 표시
+- **타입별 필터링**: LINEAR, TACTILE, CLICKY 별로 카운트 제공
 
 ## 🔒 비기능 요구사항
 
 ### 성능
-- API 응답 시간: < 200ms (캐시 히트 시)
-- 검색 응답 시간: < 500ms
-- 동시 사용자: 1000명 지원
-
-### 확장성
-- 수평 확장 가능한 구조 (Stateless)
-- Redis Cluster 지원
-- Elasticsearch 샤딩
+- **Elasticsearch 활용**: 빠른 전문 검색
+- **JPA 2차 캐시**: 엔티티 캐싱 (예정)
+- **페이지네이션**: 대용량 데이터 효율적 처리
 
 ### 안정성
-- Google Sheets API 장애 시에도 서비스 유지 (기존 DB 데이터 활용)
-- 캐시 장애 시 DB Fallback
-- 에러 로깅 및 모니터링
+- **데이터 원본 분리**: Google Sheets API 장애 시에도 MariaDB로 서비스 유지
+- **Elasticsearch 장애 대응**: ES 실패 시 로그만 남기고 서비스 계속
+- **환경 변수 관리**: Spring Dotenv로 민감 정보 분리
 
 ### 보안
-- API Rate Limiting
-- 입력 데이터 검증
-- XSS, SQL Injection 방어
-
-## 📊 모니터링 및 로깅
-
-### 모니터링 항목
-- API 응답 시간
-- 캐시 히트율
-- Elasticsearch 쿼리 성능
-- Google Sheets 동기화 상태
-
-### 로깅
-- 동기화 로그 (성공/실패, 변경 건수)
-- 검색 쿼리 로그 (인기 검색어 분석)
-- 에러 로그 (Slack/Email 알림)
+- **HTTPS 적용**: Nginx 프록시로 SSL 종단
+- **입력 데이터 검증**: Spring Validation 적용
+- **환경 변수 보호**: .env 파일 gitignore 처리
 
 ## 🚀 향후 확장 가능성
 
-1. **사용자 기능 추가**
-   - 회원가입/로그인
-   - 위시리스트
-   - 리뷰 및 평점
+### Phase 2: 성능 최적화
+- **Redis 캐싱**: 인기 스위치, 검색 결과 캐싱
+- **실시간 동기화**: JPA Event Listener 활용
+- **CDN 도입**: 정적 자산 배포
 
-2. **AI 추천**
-   - 타건음 오디오 분석
-   - ML 기반 추천 알고리즘
+### Phase 3: 기능 확장
+- **유튜브 영상 연동**: 스위치별 타건음 영상 추천
+- **보강판 데이터**: 보강판 정보 추가
+- **사용자 리뷰**: 커뮤니티 기반 평가 시스템
 
-3. **커뮤니티**
-   - 사용자 리뷰
-   - 조합 공유 (스위치 + 보강판 + 키캡)
+### Phase 4: 사용자 기능
+- **회원 시스템**: 로그인/회원가입
+- **위시리스트**: 관심 스위치 저장
+- **커스텀 조합**: 스위치 + 보강판 + 키캡 조합 공유
 
-4. **파트너십**
-   - 쇼핑몰 연동
-   - 가격 비교
-   - 구매 링크 제공
+### Phase 5: 파트너십
+- **쇼핑몰 연동**: 구매 링크 제공
+- **가격 비교**: 여러 쇼핑몰 가격 비교
+- **재고 알림**: 품절/입고 알림 서비스
