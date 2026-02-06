@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -125,26 +126,67 @@ public class SwitchSyncService {
      */
     private void saveToElasticsearch(Switch switchEntity) {
         try {
-            // 별명 가져오기 (예: "Cherry MX Red" -> ["적축", "체리적축"])
-            List<String> nicknames = switchNicknameService.getNicknames(switchEntity.getName());
+            String originalName = switchEntity.getName();
 
-            // ES 문서 생성
+            // 이름에서 한글 분리 (예: "MX Brown(체갈)" → name: "MX Brown", korean: ["체갈"])
+            List<String> koreanFromName = new ArrayList<>();
+            String cleanedName = extractKoreanFromName(originalName, koreanFromName);
+
+            // JSON 기반 별명 + 이름에서 추출한 한글 합치기
+            List<String> nicknames = new ArrayList<>(switchNicknameService.getNicknames(originalName));
+            nicknames.addAll(koreanFromName);
+
             SwitchDocument doc = SwitchDocument.builder()
                     .id(switchEntity.getId())
-                    .name(switchEntity.getName())
+                    .name(cleanedName)
                     .brand(switchEntity.getManufacturer())
-                    .category(switchEntity.getCategory()) // 카테고리 추가
-                    .nicknames(nicknames) // 별명 주입
+                    .category(switchEntity.getCategory())
+                    .nicknames(nicknames)
                     .build();
 
-            // ES 저장
             switchSearchRepository.save(doc);
 
         } catch (Exception e) {
-            // ES 저장이 실패하더라도 MariaDB 저장은 롤백되지 않도록 로그만 찍고 넘어감
-            // (검색 인덱싱은 나중에 다시 맞춰도 되지만, DB 데이터 유실은 막아야 하니까)
             log.error("Elasticsearch 인덱싱 실패 (ID: {}): {}", switchEntity.getId(), e.getMessage());
         }
+    }
+
+    /**
+     * 스위치 이름에서 한글 토큰을 분리
+     * 예: "MX Brown(체갈)" → cleanedName: "MX Brown", koreanTokens: ["체갈"]
+     * 예: "Beary 새끼곰" → cleanedName: "Beary", koreanTokens: ["새끼곰"]
+     * 예: "Silent Red" → cleanedName: "Silent Red", koreanTokens: []
+     */
+    private String extractKoreanFromName(String name, List<String> koreanTokens) {
+        if (name == null) return null;
+
+        // 특수문자를 공백으로 치환
+        String cleaned = name.replaceAll("[()\\[\\]{},/]", " ");
+
+        String[] tokens = cleaned.split("\\s+");
+        StringBuilder englishName = new StringBuilder();
+
+        for (String token : tokens) {
+            if (token.isEmpty()) continue;
+
+            if (containsKorean(token)) {
+                koreanTokens.add(token);
+            } else {
+                if (!englishName.isEmpty()) englishName.append(" ");
+                englishName.append(token);
+            }
+        }
+
+        return englishName.toString().trim();
+    }
+
+    private boolean containsKorean(String text) {
+        for (char c : text.toCharArray()) {
+            if ((c >= '\uAC00' && c <= '\uD7AF') || (c >= '\u3130' && c <= '\u318F')) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

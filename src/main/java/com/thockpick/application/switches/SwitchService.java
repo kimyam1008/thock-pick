@@ -45,7 +45,24 @@ public class SwitchService {
         if (StringUtils.hasText(keyword)) {
 
             // ES에서 검색 수행 (이름 OR 별명 OR 카테고리)
-            List<SwitchDocument> esResults = searchRepository.findByNameOrNicknamesOrCategory(keyword, keyword, keyword);
+            // 1. nicknames에서 정확 매칭 (Keyword 타입)
+            List<SwitchDocument> nicknameResults = searchRepository.findByNicknames(keyword);
+
+            // 2. name에서 형태소 분석 매칭 (Text 타입)
+            List<SwitchDocument> nameResults = searchRepository.findByName(keyword);
+
+            // 3. category에서 형태소 분석 매칭 (Text 타입)
+            List<SwitchDocument> categoryResults = searchRepository.findByCategory(keyword);
+
+            // 결과 합치기 (중복 제거)
+            List<SwitchDocument> esResults = new java.util.ArrayList<>();
+            esResults.addAll(nicknameResults);
+            nameResults.stream()
+                    .filter(doc -> esResults.stream().noneMatch(existing -> existing.getId().equals(doc.getId())))
+                    .forEach(esResults::add);
+            categoryResults.stream()
+                    .filter(doc -> esResults.stream().noneMatch(existing -> existing.getId().equals(doc.getId())))
+                    .forEach(esResults::add);
 
             if (esResults.isEmpty()) {
                 return Page.empty(pageable); // 검색 결과가 없으면 빈 페이지 반환

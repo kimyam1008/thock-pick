@@ -6,6 +6,18 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 import java.util.List;
 
 public interface SwitchSearchRepository extends ElasticsearchRepository<SwitchDocument, Long> {
-    // 이름 OR 별명 OR 카테고리 중 하나라도 매칭되면 검색
-    List<SwitchDocument> findByNameOrNicknamesOrCategory(String name, String nickname, String category);
+    /**
+     * nicknames 필드에서 정확히 일치하는 키워드 검색 (Keyword 타입)
+     */
+    List<SwitchDocument> findByNicknames(String nickname);
+
+    /**
+     * name 필드에서 형태소 분석 후 매칭 (Text 타입)
+     */
+    List<SwitchDocument> findByName(String name);
+
+    /**
+     * category 필드에서 형태소 분석 후 매칭 (Text 타입)
+     */
+    List<SwitchDocument> findByCategory(String category);
 }
