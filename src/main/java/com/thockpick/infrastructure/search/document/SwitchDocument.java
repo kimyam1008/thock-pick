@@ -27,6 +27,6 @@ public class SwitchDocument {
     @Field(type = FieldType.Text, analyzer = "nori")
     private String category;
 
-    @Field(type = FieldType.Text, analyzer = "nori")
-    private List<String> nicknames; // 우리가 주입한 별명들
+    @Field(type = FieldType.Keyword)
+    private List<String> nicknames; // 은어/약어는 정확 매칭
 }
