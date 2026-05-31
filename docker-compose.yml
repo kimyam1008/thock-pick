@@ -44,6 +44,16 @@ services:
       /bin/sh -c "./bin/elasticsearch-plugin list | grep -q analysis-nori || ./bin/elasticsearch-plugin install analysis-nori;
       /usr/local/bin/docker-entrypoint.sh elasticsearch"
 
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: thockpick-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    depends_on:
+      - app
+
 volumes:
   mariadb_data:
     driver: local
