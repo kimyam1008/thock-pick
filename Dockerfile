@@ -15,7 +15,10 @@ RUN ./gradlew bootJar -x test --no-daemon \
 # ---- Runtime stage ----
 FROM eclipse-temurin:17-jre AS runtime
 WORKDIR /app
+# 최소 권한: non-root 사용자로 실행 (Trivy DS-0002)
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 ENV TZ=Asia/Seoul
-COPY --from=build /workspace/app.jar app.jar
+COPY --from=build --chown=appuser:appgroup /workspace/app.jar app.jar
+USER appuser
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
