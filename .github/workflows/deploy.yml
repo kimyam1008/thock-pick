@@ -1,0 +1,18 @@
+name: Deploy to Home Server
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:   # Actions 탭에서 수동 재배포도 가능
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Pull latest main & redeploy
+        run: |
+          cd /home/sunny/projects/thock-pick
+          git fetch origin
+          git checkout -B main origin/main          # 항상 origin/main과 일치시킴 (.env 등 untracked는 보존)
+          docker compose up -d --build
+          docker image prune -f                     # 재빌드로 쌓이는 dangling 이미지 정리 (미니PC 디스크 보호)
