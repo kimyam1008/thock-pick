@@ -1,6 +1,18 @@
-version: '3.8'
-
 services:
+  app:
+    build: .
+    container_name: thockpick-app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # 컨테이너 네트워크 내부 주소로 오버라이드 (.env의 localhost 값 대체)
+      DB_URL: jdbc:mariadb://mariadb:3306/${MARIADB_DATABASE}
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    depends_on:
+      - mariadb
+      - elasticsearch
+    # 호스트 포트 미개방: 외부 접근은 Phase 3에서 cloudflared 경유로만 (8080 충돌 방지)
+
   mariadb:
     image: mariadb:10.11
     container_name: thock-pick-mariadb
@@ -26,13 +38,21 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ports:
-      - "9200:9200"
     volumes:
       - es_data:/usr/share/elasticsearch/data
     command: >
       /bin/sh -c "./bin/elasticsearch-plugin list | grep -q analysis-nori || ./bin/elasticsearch-plugin install analysis-nori;
       /usr/local/bin/docker-entrypoint.sh elasticsearch"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: thockpick-cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    depends_on:
+      - app
 
 volumes:
   mariadb_data:
