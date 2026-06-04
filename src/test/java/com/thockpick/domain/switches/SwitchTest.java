@@ -57,7 +57,11 @@ class SwitchTest {
         assertThat(sw.getCategory()).isEqualTo("체리");
         assertThat(sw.getWeight()).isEqualTo(45);
         assertThat(sw.getManufacturer()).isEqualTo("Cherry");
+        assertThat(sw.getPrice()).isEqualTo(300);
+        assertThat(sw.getActuationForce()).isEqualTo(45);
+        assertThat(sw.getBottomOutForce()).isEqualTo(60);
         assertThat(sw.getTravelDistance()).isEqualByComparingTo("4.0");
+        assertThat(sw.getPreTravel()).isEqualByComparingTo("2.0");
         assertThat(sw.getSoundProfile()).isEqualTo(SoundProfile.NORMAL);
         assertThat(sw.getGoogleSheetsRow()).isEqualTo(2);
     }
@@ -108,5 +112,11 @@ class SwitchTest {
         );
 
         assertThat(sw.getIsLubed()).isNull();
+        assertThat(sw.getCategory()).isNull();
+        assertThat(sw.getWeight()).isNull();
+        assertThat(sw.getManufacturer()).isNull();
+        assertThat(sw.getPrice()).isNull();
+        assertThat(sw.getTravelDistance()).isNull();
+        assertThat(sw.getPreTravel()).isNull();
     }
 }

@@ -65,6 +65,7 @@ class SwitchSheetRowTest {
                 "o, true",
                 "1, true",
                 "윤활, true",
+                "'', false",
                 "x, false",
                 "no, false"
         })

@@ -57,6 +57,7 @@ class SwitchSyncServiceTest {
 
         assertThat(switchSyncService.syncAllSwitches()).isZero();
         verify(switchRepository, never()).save(any());
+        verify(switchSearchRepository, never()).save(any());
     }
 
     @Test
@@ -66,6 +67,7 @@ class SwitchSyncServiceTest {
 
         assertThat(switchSyncService.syncAllSwitches()).isZero();
         verify(switchRepository, never()).save(any());
+        verify(switchSearchRepository, never()).save(any());
     }
 
     @Test
@@ -75,6 +77,7 @@ class SwitchSyncServiceTest {
 
         assertThat(switchSyncService.syncAllSwitches()).isZero();
         verify(switchRepository, never()).save(any());
+        verify(switchSearchRepository, never()).save(any());
     }
 
     @Test

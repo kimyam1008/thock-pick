@@ -70,6 +70,8 @@ class SwitchServiceTest {
             switchService.searchSwitches(null, null, "   ", pageable);
 
             verify(searchRepository, never()).findByNicknames(any());
+            verify(searchRepository, never()).findByName(any());
+            verify(searchRepository, never()).findByCategory(any());
         }
     }
 
